@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <title>My PWA</title>
+    <style>
+        body{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>My PWA practice</h1>
+    <h2>Welcome back</h2>
+    <h3>content</h3>
+    <script>
+        window.addEventListener('load', async () =>{
+            if ('serviceWorker' in navigator) {
+                try {
+                    const regi = await navigator.serviceWorker.register("service-worker.js")
+                } catch(e) {
+                    console.log(`註冊失敗`)
+                }
+            }
+        })
+        // 跳提醒授權: default(未授權), granted(已授權), denid(鎖)
+        if(Notification.permission === 'default') {
+            Notification.requestPermission()
+        }
+
+        if(!navigator.onLine) {
+            alert('沒有網路')
+        }
+
+        window.addEventListener('online', ()=>{
+            alert('有網路了')
+            window.location.reload()
+        })
+
+        
+    </script>
+</body>
+</html>
