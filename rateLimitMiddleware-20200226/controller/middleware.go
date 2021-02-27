@@ -21,7 +21,7 @@ func RateLimitMiddleware(c *gin.Context) {
 	value := dao.DB.Get(user.IP)
 	// if has user record (or not expire)
 	if value.Err() == nil {
-		// assign the ip's value in database to user.RateLimitValue
+		// assign the ip's value which in database to user.RateLimitValue
 		json.Unmarshal([]byte(value.Val()), &user.RateLimitValue)
 		// if > rate limit
 		if user.RemainNum <= 0 {
