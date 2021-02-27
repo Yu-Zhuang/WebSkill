@@ -19,14 +19,14 @@ func RateLimitMiddleware(c *gin.Context) {
 	user.IP = c.Request.RemoteAddr
 	// check weather database have user record
 	value := dao.DB.Get(user.IP)
-	// if has user record or not expire
+	// if has user record (or not expire)
 	if value.Err() == nil {
+		// assign the ip's value in database to user.RateLimitValue
 		json.Unmarshal([]byte(value.Val()), &user.RateLimitValue)
-		user.RemainNum--
 		// if > rate limit
-		if user.RemainNum < 0 {
-			logic.WriteRateLimitHeader(c, strconv.Itoa(0), user.ExpireTime.String())
-			// return 429 to user
+		if user.RemainNum <= 0 {
+			// write res header , return 429 to user
+			logic.WriteRateLimitHeader(c, strconv.Itoa(user.RemainNum), user.ExpireTime.String())
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"msg": "too many request",
 			})
@@ -34,6 +34,7 @@ func RateLimitMiddleware(c *gin.Context) {
 			return
 		}
 		// if not > rate limit
+		user.RemainNum--
 		b, _ := json.Marshal(&(user.RateLimitValue))
 		dao.DB.Set(user.IP, string(b), user.ExpireTime.Sub(time.Now()))
 		logic.WriteRateLimitHeader(c, strconv.Itoa(user.RemainNum), user.ExpireTime.String())
