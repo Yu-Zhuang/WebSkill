@@ -1,5 +1,4 @@
 # 2021 dcard實習生 應徵作業
-[toc]
 ## Rate Limit Middleware
 
 ### I. 實測與使用
@@ -41,36 +40,36 @@ sudo docker run -d -p 6379:6379 redis
     * 如果存入資料庫的record在rate-reset時間到沒刪除, 在用戶量多時會造成浪費
     * 因此儲存redis方式使用```redis.Set(key, value, expire)```: 可使資料在時間到期自動刪除
 2. middleware實作原始碼&註釋:
-```go=
+```go
 func RateLimitMiddleware(c *gin.Context) {
     var user models.RateLimit
-    // get req ip
     user.IP = c.Request.RemoteAddr
-    // check weather database have the ip record
+    // check weather database have user record
     value := dao.DB.Get(user.IP)
     // if has user record (or not expire)
     if value.Err() == nil {
         // assign the ip's value in database to user.RateLimitValue
         json.Unmarshal([]byte(value.Val()), &user.RateLimitValue)
-        user.RemainNum--
-        if user.RemainNum < 0 {
-            // write res header
-            logic.WriteRateLimitHeader(c, strconv.Itoa(0), user.ExpireTime.String())
-            // return 429 to user
+        // if > rate limit
+        if user.RemainNum <= 0 {
+            // write res header , return 429 to user
+            logic.WriteRateLimitHeader(c, strconv.Itoa(user.RemainNum), user.ExpireTime.String())
             c.JSON(http.StatusTooManyRequests, gin.H{
                 "msg": "too many request",
             })
             c.Abort()
             return
         }
-        // if not > rate limit: save update value to ip's record
+        // if not > rate limit
+        user.RemainNum--
         b, _ := json.Marshal(&(user.RateLimitValue))
         dao.DB.Set(user.IP, string(b), user.ExpireTime.Sub(time.Now()))
         logic.WriteRateLimitHeader(c, strconv.Itoa(user.RemainNum), user.ExpireTime.String())
+        // next()
         c.Next()
         return
     }
-    // not has or already expire: create new record save to DB
+    // not has or expire: create new record to DB
     nUser := logic.CreateNewUserRateLimit()
     b, _ := json.Marshal(&(nUser.RateLimitValue))
     dao.DB.Set(user.IP, string(b), conf.RateLimitDuration)
@@ -83,5 +82,5 @@ func RateLimitMiddleware(c *gin.Context) {
 ---
 
 ### IV. 聲明
-1. 程式碼, 使用工具選擇, 演算法皆出自於作者本人.
-2. 本小專題用於應徵工作, 可參考但請勿使用抄襲程式碼去應徵
+1. 實作程式碼, 使用工具選擇, 演算法構思等 皆出自於作者本人.
+2. 本小專題用於應徵工作, 可作參考但請勿抄襲程式碼去應徵.
