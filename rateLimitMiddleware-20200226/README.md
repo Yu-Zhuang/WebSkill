@@ -36,10 +36,17 @@ sudo docker run -d -p 6379:6379 redis
 ---
 
 ### III. 實作特殊細節闡述
-1. 減少不必要記憶體浪費: 
+1. 資料夾存放內容註釋
+    * bin: 執行程式的位元檔
+    * conf: 參數設定
+    * controller: 處理api的程序
+    * dao: 連接資料庫
+    * logic: 處理api所需的邏輯運算
+    * models: 定義存入資料庫的結構
+2. 減少不必要記憶體浪費: 
     * 如果存入資料庫的record在rate-reset時間到沒刪除, 在用戶量多時會造成浪費
     * 因此儲存redis方式使用```redis.Set(key, value, expire)```: 可使資料在時間到期自動刪除
-2. middleware實作原始碼&註釋:
+3. middleware實作原始碼&註釋:
 ```go
 func RateLimitMiddleware(c *gin.Context) {
     var user models.RateLimit
