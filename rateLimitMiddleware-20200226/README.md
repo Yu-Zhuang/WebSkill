@@ -4,15 +4,17 @@
 ### I. 實測與使用
 
 #### 1. 實測
-* **step 1** » 設定與啟動Redis (一行指令即可, 若無docker需先另外安裝docker)
+* **step 1**
+   * 下載rateLimitMiddleware.zp取得專案檔案
+* **step 2** » 設定與啟動Redis (一行指令即可, 若無docker需先另外安裝docker)
 ```sh
 sudo docker run -d -p 6379:6379 redis
 ```
 
-* **step 2** » 至 ./bin 目錄下依照作業系統環境選擇啟動執行檔, 
+* **step 3** » 至 ./bin 目錄下依照作業系統環境選擇啟動執行檔, 
 **預設 rate limit num = 3 ; duration = 1 min 方便進行測試**, 需更改可在./conf/conf.go中更改後重新go build即可
 
-* **step 3** » 以 http://127.0.0.1/ 造訪即可
+* **step 4** » 以 http://127.0.0.1/ 造訪即可
 
 #### 2. 使用
 測試範例中將該middleware寫在 ```./controller/middleware.go```
