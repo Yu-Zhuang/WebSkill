@@ -5,7 +5,7 @@
 
 #### 1. 實測
 * **step 1**
-   * 下載rateLimitMiddleware.zip取得專案檔案
+   * **下載rateLimitMiddleware.zip**取得專案檔案
 * **step 2** » 設定與啟動Redis (一行指令即可, 若無docker需先另外安裝docker)
 ```sh
 sudo docker run -d -p 6379:6379 redis
